@@ -125,15 +125,26 @@ class MeteorDataManager {
 var App = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData() {
-    // lets be nice on page load
+    var page = Session.get('page'); // hacky way of forcing it to look at the new sub handle
+    // lets be nice on sub load
     if (!sub.ready()){
       return {
+        page: page,
         tests: []
       }
     }
     return {
+      page: page,
       tests: Test.find({}, { sort: { _id: -1 } }).fetch()
     }
+  },
+  nextPage(e){
+    e.preventDefault();
+    Session.set('page', Session.get('page') + 1);
+  },
+  firstPage(e){
+    e.preventDefault();
+    Session.set('page', Math.min(1, Session.get('page') - 1));
   },
   render() {
     var rows = this.data.tests.map(function(t) {
@@ -147,6 +158,7 @@ var App = React.createClass({
     });
     return <div>
       <h3>num: {this.data.tests.length}, now: {new Date().toString()}</h3>
+      <a href="#" onClick={this.firstPage}>First Page</a> <a href="#" onClick={this.nextPage}>Next Page</a> Current {this.data.page}
       <table className="table table-bordered table-striped table-condensed">
         <thead>
         <tr>

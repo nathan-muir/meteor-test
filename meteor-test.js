@@ -2,23 +2,30 @@
 Test = new Mongo.Collection("test");
 
 if (Meteor.isClient) {
-  sub = Meteor.subscribe("test");
 
-  Template.table.helpers({
-    num: function() {
-      var r = Test.find().count() + ", " + new Date();
-      console.log(r);
-      return r;
-    },
-    records: function() {
-      return Test.find({}, { sort: { _id: -1 } });
-    }
-  });
+  Session.setDefault('page', 1);
+
+  sub = null;
+  Tracker.autorun(function(){
+    var page = Session.get('page');
+    sub = Meteor.subscribe("test", page);
+  })
+
+
+
+
 } else if (Meteor.isServer) {
-  Meteor.publish("test", function() {
-    return Test.find({}, {
-      sort: { _id: -1 },
-      //limit: 1000
+
+  NUM_PER_PAGE = 100;
+  Meteor.publish("test", function(page) {
+    return Test.find({
+      /* some criteria? */
+    }, {
+      sort: {
+        _id: 1
+      },
+      limit: NUM_PER_PAGE,
+      offset: (page - 1) * NUM_PER_PAGE
     });
   });
 }
