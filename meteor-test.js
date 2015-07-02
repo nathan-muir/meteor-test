@@ -2,9 +2,7 @@
 Test = new Mongo.Collection("test");
 
 if (Meteor.isClient) {
-  Tracker.autorun(function() {
-    Meteor.subscribe("test");
-  });
+  sub = Meteor.subscribe("test");
 
   Template.table.helpers({
     num: function() {
